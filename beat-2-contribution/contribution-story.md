@@ -55,10 +55,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Built and refined an issue scout for real GitHub searches**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I built an issue scout with Python, Java, and TypeScript search queries, free ranking filters, and my Unit 1 issue-selection rubric. The first scan graded five issues but four were already claimed, so I changed the queries from `--comments "1..10"` to `--comments "0..10"` and ranked zero-comment issues first. Direct grading later exposed a second weakness: the rubric accepted an issue already completed by a merged PR and another issue waiting on an unresolved product decision. I added a required `Issue is still valid` check and verified the revision by re-grading the same candidates; it correctly rejected HHS/simpler-grants-gov#5277 and #12056 while keeping ESCOMP/CTSM#2313 accepted.
 
 **Unit 6: [one line on the tool work]**
 
