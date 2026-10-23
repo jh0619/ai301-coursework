@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: "Show full description" does not remove ellipsis after expanding opportunity description
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -7,12 +7,11 @@ the repository is not read. **Keep every section header below under its exact na
 format criteria grade exactly that. Your course repo link is the whole submission: no tool
 files and no evidence uploads are part of Assignment 5.
 
-**Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
-**Pull Request:** [GitHub PR link, once opened]
+**Contribution Number:** 1
+**Student:** Jia Hou
+**GitHub Username:** jh0619
+**Issue:** https://github.com/HHS/simpler-grants-gov/issues/12056
+**Pull Request:** pending
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -59,11 +58,9 @@ one in the week it belongs to.
 
 I built an issue scout with Python, Java, and TypeScript search queries, free ranking filters, and my Unit 1 issue-selection rubric. The first scan graded five issues but four were already claimed, so I changed the queries from `--comments "1..10"` to `--comments "0..10"` and ranked zero-comment issues first. Direct grading later exposed a second weakness: the rubric accepted an issue already completed by a merged PR and another issue waiting on an unresolved product decision. I added a required `Issue is still valid` check and verified the revision by re-grading the same candidates; it correctly rejected HHS/simpler-grants-gov#5277 and #12056 while keeping ESCOMP/CTSM#2313 accepted.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: Added a voice guard and repository memory for upstream work**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I installed a global pre-command voice guard that checks GitHub comments against my voice guide, and its wiring test correctly stopped a body-less `gh issue comment --help` command before execution. Repro-check accepted my claim draft but identified wording that left the availability check to the maintainer and implied implementation too early, so I revised the draft to state what I had checked and promise investigation before a change. I also created an excluded `CLAUDE.local.md` for `HHS/simpler-grants-gov`; a scoped orientation captured the two relevant components, missing regression-test coverage, repository conventions, and exact frontend checks without mapping the whole repository. The orientation revealed that expansion state lives in a child component while the ellipsis is rendered by its parent, so I recorded that design boundary and the open scope question for future sessions.
 
 **Unit 7: [one line on the tool work]**
 
@@ -77,26 +74,18 @@ drafted, what you did with the draft.]
 
 ---
 
-## Why I Chose This Issue
+I found this issue through the AI301 Issue Selection site after building an issue scout that searched GitHub for open Python, Java, and TypeScript bugs and graded candidates with my issue-selection rubric. The first scan showed that recent issues with comments were often already claimed, so I changed my search strategy to include zero-comment issues and rank them first. I then directly graded the issues I was considering from the selection site. My first version of the rubric exposed another weakness: it could identify inactive repositories and competing claims, but it did not reliably detect work that had already been completed or was waiting on an unresolved decision. I added an `Issue is still valid` check to inspect current code and pull-request history.
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+In Unit 6, I replaced my strict newcomer-scope check with the staff-provided `scope-feasible` check and re-graded the same candidates. The scout accepted HHS/simpler-grants-gov#12056 with a **moderate** difficulty note because the ellipsis-after-expansion behavior is still present, the issue identifies reproducible examples, and no assignee or open pull request is working on it. The issue fits my React and TypeScript experience while giving me practice working in a larger public-sector Next.js codebase. The scout also surfaced an important limitation: the issue combines the confirmed ellipsis bug with an unclear truncation-threshold request and a closed PR that mentions an internal design plan. Instead of silently treating that uncertainty as settled, I included it as a focused question in my claim and proposed leaving threshold behavior unchanged unless the maintainer directs otherwise.
+
+**Claim comment:** https://github.com/HHS/simpler-grants-gov/issues/12056#issuecomment-6373805485
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: `issue-scout`; I used its search strategy for an initial GitHub scan and direct grading mode for the issues selected from the course site.
+- What it produced: It accepted issue #12056 after checking maintainer activity, repository use, current validity, scope feasibility, availability, and the repository's AI policy. It classified the issue as moderate difficulty because the core bug is bounded but the threshold requirement remains unclear.
+- Difficulties: The initial search favored newly claimed issues, and the original rubric did not reliably distinguish active work from stale or already-completed issues. The first validity check also treated the issue's unresolved threshold request as blocking the entire issue even though the ellipsis behavior can be investigated separately.
+- What changed: I allowed zero-comment search results and ranked them first, added an `Issue is still valid` check, and replaced `Newcomer-sized scope` with `scope-feasible` plus a non-binding difficulty note. I carried the remaining scope uncertainty into my claim as a question for the maintainer.
 
 ---
 
