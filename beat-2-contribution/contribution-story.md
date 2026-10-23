@@ -120,32 +120,28 @@ In Unit 6, I replaced my strict newcomer-scope check with the staff-provided `sc
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+I reproduced the visible behavior on the deployed `https://simpler.grants.gov` production site using macOS 27.0.1 (build 26A434) and Google Chrome 155.0.8059.85. For code-path inspection, I forked and cloned `HHS/simpler-grants-gov` at default-branch commit `f0a1eeea0852c0fe1aa23da7a8878ceda2b0c934`. The frontend requires Node.js 24.19.0 or newer, while my machine initially had Node.js 20.12.1. I installed Homebrew's Node.js 24.22.1, used npm 11.19.1, and ran `npm ci` in `frontend/`, which added 1400 packages and audited 1401 packages. The visible reproduction used the production page rather than a locally running application.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. Open https://simpler.grants.gov/opportunity/a9a78fab-33d8-4a34-a2de-c7571df8b19b in Chrome.
+2. Scroll to the Description section and confirm that the collapsed description ends with a standalone ellipsis above the `Show full description` control.
+3. Click `Show full description`.
+4. Confirm that the remaining description becomes visible and the control changes to `Hide full description`.
+5. Observe the join between the original bullet list and the newly revealed paragraph: the standalone ellipsis remains visible on its own line.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** none; the behavior was reproduced on the deployed production page without modifying repository code.
+- **Screenshots/logs:** `issue-12056-before.png` shows the collapsed description with the standalone ellipsis, and `issue-12056-after.png` shows the expanded description with the same ellipsis still present between the bullet list and the revealed paragraph. The screenshots are retained locally and will be embedded in the pull request description.
+- **My findings:** I reproduced the issue's core ellipsis-after-expansion behavior on the first URL supplied by the issue. Code inspection at commit `f0a1eeea0852c0fe1aa23da7a8878ceda2b0c934` showed that `ExpandableTextContent.tsx` renders `preSplit + "..."`, while `ContentDisplayToggle.tsx` separately owns the expanded-state value. This explains why the ellipsis does not currently react to expansion, but I have not yet selected a final fix approach. I did not treat the issue's truncation threshold or mobile/desktop parity statements as reproduced because the public issue and closed PR #12389 do not settle those requirements.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
-
+- Tool: `repro-check`; I used it first to grade the public claim draft and then to grade the claim together with the complete reproduction report, local screenshots, environment details, and code-path observation.
+- What it produced: It verified that the steps reproduced the issue's exact visible behavior, checked the screenshots against the issue, confirmed the inspected commit and code path, and returned an `accept` verdict.
+- Difficulties: The first full-package run rejected the evidence because the report named the two screenshot files without embedding them, so a reader could not verify the result from the package itself. My original environment paragraph also included dependency-install timing in a way that could imply the UI had been reproduced locally.
+- What changed: I embedded both screenshots directly in `repro-draft.md`, removed the ambiguous install detail from that report, and explicitly stated that the visible reproduction occurred on the deployed production page while the local clone was used only for code inspection.
 ---
 
 ## Solution Approach
