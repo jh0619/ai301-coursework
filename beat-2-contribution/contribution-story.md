@@ -94,27 +94,26 @@ In Unit 6, I replaced my strict newcomer-scope check with the staff-provided `sc
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+Opportunity descriptions are split into an initially visible portion and a hidden remainder. `ExpandableTextContent` permanently appends an ellipsis to the visible portion, so the ellipsis remains after the user expands the description and appears as an unnatural break between the two portions.
 
 **Expected Behavior**
 
-[What should happen?]
+When the user selects `Show full description`, the hidden content should become visible and the truncation ellipsis should disappear. Collapsing the description again should restore the ellipsis. This contribution will not change the existing truncation thresholds or attempt to define new mobile and desktop behavior unless the maintainer provides different direction.
 
 **Current Behavior**
 
-[What actually happens?]
+Selecting `Show full description` reveals the remaining text and changes the control to `Hide full description`, but the original ellipsis remains visible on its own line between the initially displayed content and the revealed paragraph.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+The behavior is primarily in `frontend/src/components/core/ExpandableTextContent.tsx`, which renders `preSplit + "..."`, and `frontend/src/components/core/ContentDisplayToggle.tsx`, which owns the expanded and collapsed state. Existing toggle behavior is covered in `ContentDisplayToggle.test.tsx`, while `ExpandableTextContent` currently has no dedicated component test, so the fix will require regression coverage for the ellipsis behavior.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
-
+- Tool: `repro-check` and the repository-local `CLAUDE.local.md`; I used them to validate the production reproduction and preserve a scoped map of the affected frontend components.
+- What it produced: The tools connected the visible ellipsis behavior to `ExpandableTextContent` rendering the ellipsis separately from the expansion state owned by `ContentDisplayToggle`.
+- Difficulties: The issue also describes inconsistent truncation thresholds and mobile/desktop behavior, but the public issue and closed PR #12389 do not settle those requirements.
+- What changed: I narrowed the current contribution to the confirmed ellipsis-after-expansion behavior and recorded the threshold questions as deliberately out of scope unless the maintainer directs otherwise.
 ---
 
 ## Reproduction Process
@@ -149,29 +148,27 @@ I reproduced the visible behavior on the deployed `https://simpler.grants.gov` p
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+`ExpandableTextContent.tsx` splits a long description into `preSplit` and `postSplit`. It renders the initial portion as `preSplit + "..."` and passes only `postSplit` into `ContentDisplayToggle`. The expanded-state value is internal to `ContentDisplayToggle.tsx`, so `ExpandableTextContent` cannot tell when the hidden content becomes visible and continues rendering the ellipsis in both states.
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+Add an optional state-change callback to `ContentDisplayToggle` so its existing internal toggle remains the source of truth while a parent can observe whether the content is expanded. In `ExpandableTextContent`, track the reported expanded state and append the ellipsis only while the remainder is collapsed. Preserve the existing toggle labels, accessibility attributes, split thresholds, short-description behavior, and mobile/desktop behavior. This change will not define a new truncation threshold or modify where the description is split.
+
+The main implementation risk is that observing the toggle state requires `ExpandableTextContent` to become a client component. I will verify that this boundary change does not affect existing callers or server-rendered output. The maintainer has also not answered the scope question, and closed PR #12389 refers to non-public accessibility and machine-readability concerns, so the eventual PR will clearly describe the narrow scope and preserve the existing content, labels, accessibility attributes, and split behavior.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
-
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+1. Update `frontend/src/components/core/ContentDisplayToggle.tsx` with an optional callback that reports the new visibility state whenever the toggle button is activated, without changing behavior for existing callers.
+2. Update `frontend/src/components/core/ExpandableTextContent.tsx` as a client component, observe the reported visibility state, and render the ellipsis only when the additional content is collapsed.
+3. Add regression coverage for a long expandable description, verifying that the ellipsis is present when collapsed, disappears after `Show full description` is selected, and returns after the description is collapsed again.
+4. Run the targeted component tests followed by the frontend unit tests, lint, TypeScript check, and Prettier formatting check listed in `ship-manifest.md`.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: `plan-check`; I used it to grade `plan.md` together with a draft plan comment against the live issue, posted reproduction, repository rules, and current source.
+- What it produced: The final run passed all six checks, confirming that the diagnosis follows from the reproduction, the scope is bounded, the callback approach addresses the state boundary, and the three-state regression test can prove the fix.
+- Difficulties: The first run accepted the plan but failed the preferred risks-and-unknowns check because it did not record the unanswered scope question, the client-component boundary change, or the accessibility concerns mentioned in closed PR #12389.
+- What changed: I identified `ExpandableTextContent` becoming a client component as an implementation risk, added four explicit risks and unknowns to `plan.md`, and recorded how the implementation will preserve existing callers, content, accessibility attributes, and split behavior.
 
 ---
 
