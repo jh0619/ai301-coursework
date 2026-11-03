@@ -174,18 +174,16 @@ The main implementation risk is that observing the toggle state requires `Expand
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+The before-fix evidence is the production reproduction from 2026-10-23: after selecting `Show full description`, the additional text appeared but the original ellipsis remained between the two portions of the description. The branch-level after-fix evidence is a new `ExpandableTextContent` component test that exercises the observable collapsed, expanded, and collapsed-again sequence through the real toggle control. It asserts that the ellipsis is present when collapsed, absent when expanded, and restored after re-collapsing. A second test confirms that content below the split threshold still renders without an ellipsis or toggle.
+
+I also ran the repository checks recorded in `ship-manifest.md`. The targeted regression test passed 2 tests; the complete frontend suite passed 376 suites and 2992 tests with 12 existing skips; lint completed with 0 errors and 35 existing warnings; TypeScript generated route types and completed without errors; Prettier reported that all files matched; and `git diff --check` produced no output.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
-
+- Tool: `ship-manifest.md`, Jest, and `test_evidence.md`; I used the manifest to run the repository's required checks and saved the issue-specific before/after evidence and exact results for the ship-gate and PR description.
+- What it produced: The targeted test proved the collapsed, expanded, and collapsed-again ellipsis behavior, while the full unit, lint, type, formatting, and whitespace checks verified the broader branch.
+- Difficulties: The first complete test run after synchronizing with the latest upstream branch produced four unrelated validation-message failures because the local dependencies still matched the older lockfile.
+- What changed: I ran `npm ci` against the current `package-lock.json` without modifying the unrelated tests, then reran the full suite and obtained 376 passing suites and 2992 passing tests.
 ---
 
 ## Implementation Notes
@@ -198,12 +196,16 @@ I claimed issue #12056 after confirming that it was open, unassigned, and had no
 
 I posted the promised reproduction update within the three-day reporting window: https://github.com/HHS/simpler-grants-gov/issues/12056#issuecomment-6403510277. The update records the production environment, reproduction steps, expected and actual behavior, and the relevant component boundary. I kept the full screenshots and detailed report for the pull request rather than posting the complete reproduction package on the issue.
 
+**2026-11-02**
+
+I synchronized my fork with the latest upstream `main` and created `jh0619/12056-remove-expanded-ellipsis`. Plan-check first accepted the callback approach but identified an unrecorded client-component risk, so I updated the plan before implementation. On the branch, I added an optional visibility callback to `ContentDisplayToggle`, used the reported state in `ExpandableTextContent` to conditionally render the ellipsis, and added a dedicated regression test covering collapsed, expanded, collapsed-again, and short-content behavior. The targeted test and all four manifest checks passed after reinstalling dependencies for the updated lockfile.
+
 **Toolkit**
 
-- Tool: Voice Guard and `repro-check`; I used them to check the public reproduction update before posting it.
-- What it produced: Voice Guard accepted the revised update, and the published comment documented the environment, steps, expected result, actual result, and code-path observation.
-- Difficulties: The first short update claimed reproduction without enough supporting detail to satisfy my voice-guide rule, while a later generated revision duplicated sections and was too long for a progress comment.
-- What changed: I replaced it with a concise, self-contained update, manually verified it with Voice Guard, rejected the duplicated overwrite, and posted the approved draft unchanged.
+- Tool: Voice Guard, `repro-check`, `plan-check`, Claude Code with `CLAUDE.local.md`, and the ship-gate manifest; I used them across the claim, reproduction, planning, implementation, and testing stages.
+- What it produced: The tools produced an accepted public update, an accepted implementation plan, a focused three-file diff, a new regression test, and observable passing results for the targeted and full repository checks.
+- Difficulties: The first plan omitted the client-component risk, a generated public-update draft duplicated content, and the first full branch test used stale dependencies after the upstream sync.
+- What changed: I added explicit plan risks, rejected the duplicated draft, kept the implementation inside the accepted scope, ran `npm ci` for the current lockfile, and reran the complete checks successfully.
 
 ---
 
