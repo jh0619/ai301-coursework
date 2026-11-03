@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Jia Hou
 **GitHub Username:** jh0619
 **Issue:** https://github.com/HHS/simpler-grants-gov/issues/12056
-**Pull Request:** pending
+**Pull Request:** https://github.com/HHS/simpler-grants-gov/pull/13116
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -62,10 +62,9 @@ I built an issue scout with Python, Java, and TypeScript search queries, free ra
 
 I installed a global pre-command voice guard that checks GitHub comments against my voice guide, and its wiring test correctly stopped a body-less `gh issue comment --help` command before execution. Repro-check accepted my claim draft but identified wording that left the availability check to the maintainer and implied implementation too early, so I revised the draft to state what I had checked and promise investigation before a change. I also created an excluded `CLAUDE.local.md` for `HHS/simpler-grants-gov`; a scoped orientation captured the two relevant components, missing regression-test coverage, repository conventions, and exact frontend checks without mapping the whole repository. The orientation revealed that expansion state lives in a child component while the ellipsis is rendered by its parent, so I recorded that design boundary and the open scope question for future sessions.
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: Added a ship-gate and opened a checked upstream pull request**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+I created a repository-specific gate manifest that runs the frontend unit tests, lint, TypeScript check, and formatting check before a PR can open. On my real branch, all four commands passed, but pr-precheck stopped the first draft because `Fixes #12056` would close an issue whose threshold requirements remain unresolved, then stopped the second draft because the repository requires a designated maintainer tag. I changed the description to `Work for #12056`, explicitly disclosed the partial scope, and tagged `@serverless-mom`; the final gate passed every check and Claude Code opened PR #13116. Claude Code appended its generated-with-Claude attribution while posting the PR, but it did not change the implementation or test evidence.
 
 **Unit 8: [one line on the tool work]**
 
@@ -211,27 +210,23 @@ I synchronized my fork with the latest upstream `main` and created `jh0619/12056
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/HHS/simpler-grants-gov/pull/13116
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** The PR explains that the persistent ellipsis came from `ExpandableTextContent` rendering it unconditionally while `ContentDisplayToggle` separately owned the visibility state. It proposes an optional visibility callback, conditionally renders the ellipsis only while collapsed, and adds regression tests for collapsed, expanded, collapsed-again, and short-content behavior. The description uses `Work for #12056` and identifies the PR as a partial fix because it deliberately leaves the unresolved character thresholds and mobile/desktop requirements unchanged. It also records the targeted and complete frontend check results and discloses how AI assistance was used.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-02: None yet; the PR is open and `@serverless-mom` is tagged in the description according to the repository's review-assignment instructions.
+- 2026-11-02: No maintainer-requested changes to address yet.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: `ship-gate`, its repository-specific `ship-manifest.md`, and `pr-precheck`; I used them to run the project's checks and review the branch, evidence, and PR description before opening the PR through Claude Code.
+- What it produced: The manifest ran four successful repository checks, and the final pr-precheck passed plan fidelity, description accuracy, observable evidence, focused diff, repository standards, and reviewer context before PR #13116 opened.
+- Difficulties: The first gate run rejected `Fixes #12056` because this PR does not resolve every requirement in the issue, and the second rejected the draft because it did not tag one of the repository's designated maintainers.
+- What changed: I replaced `Fixes` with `Work for`, stated clearly that the change is a partial fix, explained which requirements remain unresolved, and added `@serverless-mom`. Claude Code later appended its attribution line while posting, without changing the implementation.
 
 ---
 
