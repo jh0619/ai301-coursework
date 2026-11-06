@@ -197,6 +197,10 @@ I posted the promised reproduction update within the three-day reporting window:
 
 I synchronized my fork with the latest upstream `main` and created `jh0619/12056-remove-expanded-ellipsis`. Plan-check first accepted the callback approach but identified an unrecorded client-component risk, so I updated the plan before implementation. On the branch, I added an optional visibility callback to `ContentDisplayToggle`, used the reported state in `ExpandableTextContent` to conditionally render the ellipsis, and added a dedicated regression test covering collapsed, expanded, collapsed-again, and short-content behavior. The targeted test and all four manifest checks passed after reinstalling dependencies for the updated lockfile.
 
+**2026-11-06**
+
+I installed the PR monitor and wrote a response playbook based on the repository's contribution rules and five recently merged external PRs. Their first-maintainer-response times ranged from 0.8 to 32.2 days, so I set a 21-quiet-day threshold for an initial nudge. The monitor found PR #13116 mergeable but still awaiting review after 3 quiet days and drafted a wait note. I kept the note private and posted nothing because the threshold had not been met.
+
 **Toolkit**
 
 - Tool: Voice Guard, `repro-check`, `plan-check`, Claude Code with `CLAUDE.local.md`, and the ship-gate manifest; I used them across the claim, reproduction, planning, implementation, and testing stages.
@@ -231,25 +235,21 @@ I synchronized my fork with the latest upstream `main` and created `jh0619/12056
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+I learned how to trace a UI defect across a React parent-child state boundary instead of treating the visible symptom as an isolated string change. I added an optional callback without changing existing callers, converted `ExpandableTextContent` into a client component so it could observe the toggle state, and wrote a Jest/React Testing Library regression test that exercises collapsed, expanded, and collapsed-again behavior through the real control. I also practiced the complete external-contribution workflow: forking and synchronizing an upstream repository, following its branch and PR conventions, running repository-specific checks, and opening a focused PR from a fork.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+The issue mixed a confirmed ellipsis defect with unresolved truncation-threshold and mobile/desktop requirements. I handled that uncertainty by reproducing only what I could verify, asking the maintainer a focused scope question, keeping the threshold work out of the implementation, and changing the PR from `Fixes #12056` to `Work for #12056` when pr-precheck showed that the original wording would close a partially unresolved issue. I also encountered four unrelated unit-test failures after updating from upstream; rather than editing unrelated tests, I recognized that `node_modules` was stale, ran `npm ci` against the current lockfile, and confirmed that all 376 suites passed. Finally, ship-gate caught the missing designated-maintainer tag before the PR opened, so I corrected the description and reran the complete gate successfully.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I would compare every expected-result bullet with my proposed scope before drafting the PR, which would have led me to use `Work for` from the beginning. I would also extract the repository's reviewer-assignment rule into my local memory file earlier, reinstall dependencies immediately after synchronizing a changed lockfile, and record the client-component boundary as a risk during the first planning pass. These changes would reduce repeated gate runs without weakening the checks that caught real problems.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- [Issue #12056 and its reproduction examples](https://github.com/HHS/simpler-grants-gov/issues/12056) — defined the visible behavior and supplied the production opportunity URLs I used.
+- [Simpler Grants CONTRIBUTING.md](https://github.com/HHS/simpler-grants-gov/blob/main/CONTRIBUTING.md) — provided the external-contributor workflow, PR title convention, AI policy, and designated-reviewer requirement.
+- [Frontend development guide](https://github.com/HHS/simpler-grants-gov/blob/main/documentation/frontend/development.md) — provided the required Node version and the unit-test, lint, TypeScript, and formatting commands.
+- [Closed PR #12389](https://github.com/HHS/simpler-grants-gov/pull/12389) — exposed the unresolved internal design, accessibility, and machine-readability concerns that led me to keep the contribution narrowly scoped.
